@@ -1,0 +1,8 @@
+{
+  "name": "Auto select headset",
+  "description": "Auto selects headsets when possible instead of showing a dialog",
+  "uuid": "autoselectheadset@josephlbarnett.github.com",
+  "shell-version": [
+    "3.38"
+  ]
+}
