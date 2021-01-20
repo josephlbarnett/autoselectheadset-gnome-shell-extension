@@ -46,17 +46,30 @@ const AutoSelectHeadsetAsync = function(params, invocation) {
     invocation.return_value(null);
 }
 
-const originalOpenAsync = Main.shellAudioSelectionDBusService.OpenAsync;
+let originalOpenAsync = null;
 class AutoSelectHeadsetExtension {
     constructor() {
     }
 
-    enable() {
+    replace() {
+        originalOpenAsync = Main.shellAudioSelectionDBusService.OpenAsync;
         Main.shellAudioSelectionDBusService.OpenAsync = AutoSelectHeadsetAsync
     }
 
+    enable() {
+        GLib.idle_add(GLib.PRIOIRTY_DEFAULT, () => {
+            if (Main.shellAudioSelectionDBusService) {
+                this.replace();
+            } else {
+                this.enable();
+            }
+        });
+    }
+
     disable() {
-        Main.shellAudioSelectionDBusService.OpenAsync = originalOpenAsync;
+        if (originalOpenAsync) {
+            Main.shellAudioSelectionDBusService.OpenAsync = originalOpenAsync;
+        }
     }
 }
 
