@@ -16,12 +16,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
-/* exported init */
-
-const AudioDeviceSelectionDBus = imports.ui.audioDeviceSelection.AudioDeviceSelectionDBus;
-const AudioDevice = imports.ui.audioDeviceSelection.AudioDevice;
-const Main = imports.ui.main;
-const { GLib } = imports.gi;
+import GLib from "gi://GLib";
+import { Extension } from "resource:///org/gnome/shell/extensions/extension.js";
+import * as Main from "resource:///org/gnome/shell/ui/main.js";
 
 const AutoSelectHeadsetAsync = function(params, invocation) {
     let [deviceNames] = params;
@@ -46,20 +43,22 @@ const AutoSelectHeadsetAsync = function(params, invocation) {
     invocation.return_value(null);
 }
 
-let originalOpenAsync = null;
-class AutoSelectHeadsetExtension {
-    constructor() {
+export default class AutoSelectHeadset extends Extension {
+    #originalOpenAsync = null;
+
+    constructor(metadata) {
+        super(metadata);
     }
 
-    replace() {
-        originalOpenAsync = Main.shellAudioSelectionDBusService.OpenAsync;
+    #replace() {
+        this.#originalOpenAsync = Main.shellAudioSelectionDBusService.OpenAsync;
         Main.shellAudioSelectionDBusService.OpenAsync = AutoSelectHeadsetAsync
     }
 
     enable() {
         GLib.idle_add(GLib.PRIOIRTY_DEFAULT, () => {
             if (Main.shellAudioSelectionDBusService) {
-                this.replace();
+                this.#replace();
             } else {
                 this.enable();
             }
@@ -67,12 +66,9 @@ class AutoSelectHeadsetExtension {
     }
 
     disable() {
-        if (originalOpenAsync) {
-            Main.shellAudioSelectionDBusService.OpenAsync = originalOpenAsync;
+        if (this.#originalOpenAsync) {
+            Main.shellAudioSelectionDBusService.OpenAsync = this.#originalOpenAsync;
+            this.#originalOpenAsync = null;
         }
     }
-}
-
-function init() {
-    return new AutoSelectHeadsetExtension();
 }
