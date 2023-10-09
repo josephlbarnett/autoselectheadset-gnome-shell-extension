@@ -45,6 +45,7 @@ const AutoSelectHeadsetAsync = function(params, invocation) {
 
 export default class AutoSelectHeadset extends Extension {
     #originalOpenAsync = null;
+    #sourceId = null;
 
     constructor(metadata) {
         super(metadata);
@@ -56,7 +57,7 @@ export default class AutoSelectHeadset extends Extension {
     }
 
     enable() {
-        GLib.idle_add(GLib.PRIOIRTY_DEFAULT, () => {
+        this.#sourceId = GLib.idle_add(GLib.PRIOIRTY_DEFAULT, () => {
             if (Main.shellAudioSelectionDBusService) {
                 this.#replace();
             } else {
@@ -66,6 +67,10 @@ export default class AutoSelectHeadset extends Extension {
     }
 
     disable() {
+        if (this.#sourceId) {
+            GLib.Source.remove(this.#sourceId);
+            this.#sourceId = null;
+        }
         if (this.#originalOpenAsync) {
             Main.shellAudioSelectionDBusService.OpenAsync = this.#originalOpenAsync;
             this.#originalOpenAsync = null;
