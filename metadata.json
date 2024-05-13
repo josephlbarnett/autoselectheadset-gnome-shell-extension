@@ -3,8 +3,8 @@
   "description": "Auto selects headsets when possible instead of showing a dialog",
   "uuid": "autoselectheadset@josephlbarnett.github.com",
   "url": "https://github.com/josephlbarnett/autoselectheadset-gnome-shell-extension",
-  "version": "9",
+  "version": "10",
   "shell-version": [
-    "45"
+    "45", "46"
   ]
 }
