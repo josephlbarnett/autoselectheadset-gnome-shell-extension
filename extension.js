@@ -57,7 +57,7 @@ export default class AutoSelectHeadset extends Extension {
     }
 
     enable() {
-        this.#sourceId = GLib.idle_add(GLib.PRIOIRTY_DEFAULT, () => {
+        this.#sourceId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
             if (Main.shellAudioSelectionDBusService) {
                 this.#replace();
             } else {
